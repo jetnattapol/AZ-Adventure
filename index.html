@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A–Z Adventure World | ผจญภัยโลกตัวอักษรอังกฤษ</title>
+    <!-- Tailwind CSS v4 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts: Fredoka (น่ารักสไตล์เด็ก) & Prompt (ภาษาไทย) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Fredoka', 'Prompt', sans-serif;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #f9fafb 0%, #f3f4f6 100%);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Glassmorphism เกรดพรีเมียมสไตล์ iOS App Store */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08);
+        }
+
+        /* ปุ่มกด 3D แบบนุ่มนวล กดแล้วมีมิติดีเด้ง */
+        .btn-3d {
+            position: relative;
+            transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateY(0);
+        }
+        .btn-3d:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            filter: brightness(0.95);
+        }
+
+        /* แอนิเมชันลอยได้ของมาสคอตและกล่องข้อความ */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* ระบบสั่นแจ้งเตือนเมื่อเด็กตอบผิด (Haptic Shake) */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        /* แอนิเมชันสำหรับปุ่มที่ปลดล็อกแล้ววิบวับน่ากด */
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.9); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .perspective-1000 { perspective: 1000px; }
+        .card-inner {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .card-flipped { transform: rotateY(180deg); }
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back { transform: rotateY(180deg); }
+
+        ::-webkit-scrollbar { display: none; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #cert-print-area, #cert-print-area * { visibility: visible; }
+            #cert-print-area {
+                position: absolute;
+                left: 50%; top: 50%;
+                transform: translate(-50%, -50%) scale(1);
+                width: 100%; max-width: 800px;
+                border: 15px double #F59E0B;
+                background: #FFFBEB !important;
+                padding: 40px;
+                box-shadow: none;
+            }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-tr from-indigo-100 via-pink-50 to-emerald-100 min-h-screen flex flex-col justify-between p-3 md:p-6 relative">
+
+    <canvas id="confetti-canvas" class="absolute inset-0 pointer-events-none z-50 w-full h-full"></canvas>
+
+    <!-- TOP CONTROL HEADER BAR -->
+    <header class="w-full max-w-4xl mx-auto flex justify-between items-center z-10 mb-3">
+        <div class="flex gap-2 items-center">
+            <div class="glass-panel px-4 py-2 rounded-2xl font-bold text-indigo-700 flex items-center gap-2 text-xs md:text-sm shadow-md">
+                <i class="fa-solid fa-user-astronaut text-pink-500 text-base"></i> 
+                <span id="header-player-name">ผู้กล้าตัวน้อย</span>
+            </div>
+            <div class="glass-panel px-4 py-2 rounded-2xl font-bold text-amber-600 flex items-center gap-2 text-xs md:text-sm shadow-md">
+                <i class="fa-solid fa-star text-amber-400 text-base"></i> 
+                <span id="header-stars">0</span> ดวง
+            </div>
+            <div class="glass-panel px-4 py-2 rounded-2xl font-bold text-emerald-600 flex items-center gap-2 text-xs md:text-sm shadow-md">
+                <i class="fa-solid fa-coins text-yellow-500 text-base"></i> 
+                <span id="header-coins">0</span>
+            </div>
+        </div>
+        <button onclick="openAdminModal()" class="glass-panel w-10 h-10 rounded-2xl flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-all btn-3d shadow-md">
+            <i class="fa-solid fa-chalkboard-user text-base"></i>
+        </button>
+    </header>
+
+    <!-- MAIN APP SCREEN CONTAINER -->
+    <main id="game-container" class="w-full max-w-4xl mx-auto flex-1 flex flex-col justify-center items-center z-10 my-2">
+        <!-- Screens render natively here via JS -->
+    </main>
+
+    <!-- COMPANION HELPER BOT -->
+    <footer id="companion-box" class="w-full max-w-xl mx-auto mt-3 glass-panel p-3.5 rounded-2xl flex items-center gap-4 border-2 border-white/80 hidden shadow-lg">
+        <div id="companion-avatar" class="text-4xl md:text-5xl animate-float filter drop-shadow">🦖</div>
+        <div class="flex-1 bg-white/90 p-3 rounded-xl relative border border-slate-100">
+            <div class="absolute w-3 h-3 bg-white left-0 top-1/2 -translate-x-1.5 -translate-y-1/2 rotate-45 border-l border-b border-slate-100"></div>
+            <p id="companion-text" class="text-xs md:text-sm text-slate-700 font-bold leading-relaxed">ยินดีต้อนรับสู่เกาะเวทมนตร์ภาษาอังกฤษ!</p>
+        </div>
+    </footer>
+
+    <!-- ADMIN MODAL DIALOG -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center p-4 backdrop-blur-md transition-all">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-indigo-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-lg md:text-xl font-bold text-indigo-700 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> ระบบควบคุมสำหรับคุณครู (Admin)
+                </h3>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-3xl font-light">&times;</button>
+            </div>
+            
+            <div id="admin-auth" class="text-center py-6">
+                <p class="text-slate-600 mb-4 font-semibold text-sm">กรุณากรอกรหัสผ่านคุณครูเพื่อเข้าใช้งาน (รหัสผ่านเริ่มต้น: 1234)</p>
+                <input type="password" id="admin-pass-input" class="border-3 border-indigo-100 rounded-2xl px-4 py-2.5 text-center text-xl font-bold tracking-widest focus:outline-indigo-400 mb-4 w-48 shadow-inner" placeholder="••••">
+                <br>
+                <button onclick="verifyAdminPassword()" class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl btn-3d shadow-md hover:bg-indigo-700 text-sm">ยืนยันรหัสผ่าน</button>
+            </div>
+
+            <div id="admin-content" class="hidden space-y-6">
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-100">
+                        <p class="text-[11px] text-indigo-600 font-bold">นักเรียนทั้งหมด</p>
+                        <p id="dash-total-players" class="text-xl font-extrabold text-indigo-800">0</p>
+                    </div>
+                    <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-100">
+                        <p class="text-[11px] text-amber-600 font-bold">ดาวรวมสูงสุด</p>
+                        <p id="dash-top-score" class="text-xl font-extrabold text-amber-800">0</p>
+                    </div>
+                    <div class="bg-emerald-50/60 p-3 rounded-xl border border-emerald-100">
+                        <p class="text-[11px] text-emerald-600 font-bold">รอบเล่นสะสม</p>
+                        <p id="dash-total-plays" class="text-xl font-extrabold text-emerald-800">0</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                    <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-chart-bar text-indigo-500"></i> แผนภูมิเปรียบเทียบคะแนนดาวของเด็กๆ</p>
+                    <div class="h-44 relative"><canvas id="adminChart"></canvas></div>
+                </div>
+
+                <div class="border-t pt-4">
+                    <p class="font-bold text-slate-700 text-xs md:text-sm mb-2 flex items-center gap-1.5">
+                        <i class="fa-solid fa-spell-check text-purple-500"></i> ปรับแต่งคำศัพท์แอนิเมชันและรูปภาพอีโมจิ (A-Z)
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 bg-slate-50 rounded-xl border border-slate-200" id="word-editor-list"></div>
+                </div>
+
+                <div class="border-t pt-4 flex justify-between items-center bg-red-50 p-3 rounded-xl border border-red-100">
+                    <div>
+                        <p class="text-xs font-bold text-red-700">ล้างสถิติข้อมูลของห้องเรียน</p>
+                        <p class="text-[10px] text-red-400">ลบข้อมูลผู้เล่น สถิติดาว และคำศัพท์ดัดแปลงทั้งหมด</p>
+                    </div>
+                    <button onclick="resetSystemDatabase()" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl btn-3d shadow-md">รีเซ็ตทั้งหมด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENGINE LOGICS -->
+    <script>
+        const DEFAULT_WORDS = {
+            'A': { word: 'Apple', emoji: '🍎' }, 'B': { word: 'Bird', emoji: '🐦' }, 'C': { word: 'Cat', emoji: '🐱' }, 'D': { word: 'Dog', emoji: '🐶' }, 'E': { word: 'Elephant', emoji: '🐘' },
+            'F': { word: 'Fish', emoji: '🐟' }, 'G': { word: 'Grapes', emoji: '🍇' }, 'H': { word: 'Horse', emoji: '🐴' }, 'I': { word: 'Ice cream', emoji: '🍦' }, 'J': { word: 'Juice', emoji: '🥤' },
+            'K': { word: 'Kite', emoji: '🪁' }, 'L': { word: 'Lion', emoji: '🦁' }, 'M': { word: 'Monkey', emoji: '🐵' }, 'N': { word: 'Nest', emoji: '🪹' }, 'O': { word: 'Orange', emoji: '🍊' },
+            'P': { word: 'Panda', emoji: '🐼' }, 'Q': { word: 'Queen', emoji: '👸' }, 'R': { word: 'Rabbit', emoji: '🐰' }, 'S': { word: 'Sun', emoji: '☀️' }, 'T': { word: 'Tiger', emoji: '🐯' },
+            'U': { word: 'Umbrella', emoji: '☂️' }, 'V': { word: 'Van', emoji: '🚐' }, 'W': { word: 'Watermelon', emoji: '🍉' }, 'X': { word: 'Xylophone', emoji: '🪘' }, 'Y': { word: 'Yo-yo', emoji: '🪀' }, 'Z': { word: 'Zebra', emoji: '🦓' }
+        };
+
+        const WORLDS = [
+            { id: 1, name: "Forest ABC", letters: ['A','B','C','D','E'], minStars: 0, gradient: "from-emerald-400 to-teal-500", labelBg: "bg-emerald-600", icon: "🌲" },
+            { id: 2, name: "Ocean Letters", letters: ['F','G','H','I','J'], minStars: 3, gradient: "from-sky-400 to-blue-500", labelBg: "bg-blue-600", icon: "🐙" },
+            { id: 3, name: "Space Alphabet", letters: ['K','L','M','N','O'], minStars: 6, gradient: "from-indigo-400 to-purple-600", labelBg: "bg-purple-600", icon: "🚀" },
+            { id: 4, name: "Magic Castle", letters: ['P','Q','R','S','T'], minStars: 9, gradient: "from-pink-400 to-rose-500", labelBg: "bg-rose-600", icon: "🏰" },
+            { id: 5, name: "Dragon Mountain", letters: ['U','V','W','X','Y','Z'], minStars: 12, gradient: "from-amber-400 to-red-500", labelBg: "bg-red-600", icon: "🌋" }
+        ];
+
+        let state = {
+            player: { name: "", avatar: "👦", pet: "🦖", stars: 0, coins: 0, clearedWorlds: [] },
+            customWords: {}, history: [], dailyCooldown: null, currentWorld: null, currentStageIdx: 0
+        };
+
+        let activeChart = null;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSoundTone(freq, type, duration) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { console.log("Audio ctx error."); }
+        }
+
+        const gameAudio = {
+            click: () => playSoundTone(580, 'sine', 0.08),
+            correct: () => { playSoundTone(523.25, 'triangle', 0.12); setTimeout(() => playSoundTone(659.25, 'triangle', 0.18), 80); },
+            wrong: () => playSoundTone(170, 'sawtooth', 0.28),
+            victory: () => {
+                playSoundTone(523, 'sine', 0.15);
+                setTimeout(() => playSoundTone(659, 'sine', 0.15), 120);
+                setTimeout(() => playSoundTone(784, 'sine', 0.35), 240);
+            }
+        };
+
+        function speakPhonics(text, fastMode = false) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'en-US';
+            speech.rate = fastMode ? 0.9 : 0.75;
+            speech.pitch = 1.25;
+            window.speechSynthesis.speak(speech);
+        }
+
+        window.onload = function() {
+            initLocalStorageData();
+            renderAppScreen('login');
+            initConfettiEngine();
+        };
+
+        function initLocalStorageData() {
+            if (localStorage.getItem('az_adv_player')) state.player = JSON.parse(localStorage.getItem('az_adv_player'));
+            if (localStorage.getItem('az_adv_words')) state.customWords = JSON.parse(localStorage.getItem('az_adv_words'));
+            if (localStorage.getItem('az_adv_history')) state.history = JSON.parse(localStorage.getItem('az_adv_history'));
+            if (localStorage.getItem('az_adv_daily')) state.dailyCooldown = localStorage.getItem('az_adv_daily');
+            updateTopBarUI();
+        }
+
+        function saveStateToStorage() {
+            localStorage.setItem('az_adv_player', JSON.stringify(state.player));
+            localStorage.setItem('az_adv_words', JSON.stringify(state.customWords));
+            localStorage.setItem('az_adv_history', JSON.stringify(state.history));
+            if(state.dailyCooldown) localStorage.setItem('az_adv_daily', state.dailyCooldown);
+        }
+
+        function getWordData(letter) {
+            return state.customWords[letter] || DEFAULT_WORDS[letter];
+        }
+
+        function updateTopBarUI() {
+            document.getElementById('header-player-name').innerText = state.player.name || "ผู้กล้าตัวน้อย";
+            document.getElementById('header-stars').innerText = state.player.stars;
+            document.getElementById('header-coins').innerText = state.player.coins;
+            document.getElementById('companion-avatar').innerText = state.player.pet;
+        }
+
+        function changeCompanionTalk(msg) {
+            const box = document.getElementById('companion-box');
+            box.classList.remove('hidden');
+            document.getElementById('companion-text').innerText = msg;
+        }
+
+        let canvasCtx, confettiList = [];
+        function initConfettiEngine() {
+            const cvs = document.getElementById('confetti-canvas');
+            canvasCtx = cvs.getContext('2d');
+            window.addEventListener('resize', () => { cvs.width = window.innerWidth; cvs.height = window.innerHeight; });
+            cvs.width = window.innerWidth; cvs.height = window.innerHeight;
+        }
+
+        function triggerConfettiBurst() {
+            confettiList = [];
+            for (let i = 0; i < 90; i++) {
+                confettiList.push({
+                    x: Math.random() * window.innerWidth,
+                    y: Math.random() * -window.innerHeight,
+                    w: Math.random() * 8 + 6,
+                    h: Math.random() * 12 + 6,
+                    color: `hsl(${Math.random() * 360}, 95%, 65%)`,
+                    vy: Math.random() * 4 + 3,
+                    vx: Math.random() * 3 - 1.5,
+                    rotation: Math.random() * 360
+                });
+            }
+            loopConfettiAnimation();
+        }
+
+        function loopConfettiAnimation() {
+            if (confettiList.length === 0) return;
+            canvasCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            confettiList.forEach((c, idx) => {
+                c.y += c.vy; c.x += c.vx; c.rotation += 3;
+                canvasCtx.save();
+                canvasCtx.translate(c.x, c.y);
+                canvasCtx.rotate(c.rotation * Math.PI / 180);
+                canvasCtx.fillStyle = c.color;
+                canvasCtx.fillRect(-c.w/2, -c.h/2, c.w, c.h);
+                canvasCtx.restore();
+                if (c.y > window.innerHeight) confettiList.splice(idx, 1);
+            });
+            requestAnimationFrame(loopConfettiAnimation);
+        }
+
+        function playWrongAnswerShake() {
+            const view = document.getElementById('game-container');
+            view.classList.add('animate-shake');
+            gameAudio.wrong();
+            setTimeout(() => view.classList.remove('animate-shake'), 400);
+        }
+
+        function renderAppScreen(targetScreen) {
+            gameAudio.click();
+            const container = document.getElementById('game-container');
+            
+            if (targetScreen === 'login') {
+                document.getElementById('companion-box').classList.add('hidden');
+                /* นำ คลาส .animate-float ออกจากกล่อง panel ด้านล่างนี้แล้ว เพื่อให้นิ่งสนิท */
+                container.innerHTML = `
+                    <div class="glass-panel p-6 rounded-3xl w-full max-w-md text-center border-4 border-white shadow-xl">
+                        <div class="inline-block bg-gradient-to-r from-amber-400 to-pink-400 text-white font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-2 shadow-sm">Educational Game</div>
+                        <h1 class="text-3xl md:text-4xl font-extrabold text-indigo-600 tracking-wide drop-shadow-sm">A–Z Adventure</h1>
+                        <p class="text-xs font-semibold text-pink-500 mb-5 tracking-widest">ผจญภัยโลกตัวอักษรอังกฤษแสนสนุก</p>
+                        
+                        <div class="space-y-4 text-left">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">ชื่อผู้กล้าตัวน้อย :</label>
+                                <input type="text" id="player-name-inp" value="${state.player.name}" class="w-full bg-white border-2 border-slate-200 rounded-xl px-4 py-2.5 font-bold text-slate-700 text-center focus:outline-indigo-400 transition-all text-sm shadow-inner" placeholder="พิมพ์ชื่อของหนูตรงนี้เลย...">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">เลือกฮีโร่ประทับใจ :</label>
+                                <div class="grid grid-cols-4 gap-2 text-2xl" id="avatar-container">
+                                    ${['👦','👧','🐱','🦁'].map(av => `
+                                        <button onclick="pickHeroNode(this, '${av}')" class="bg-white p-2 rounded-xl border-2 ${state.player.avatar === av ? 'border-indigo-400 bg-indigo-50/50' : 'border-slate-100'} btn-3d shadow-sm">${av}</button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">เลือกคู่หูผู้ช่วย :</label>
+                                <div class="grid grid-cols-3 gap-2 text-xl" id="pet-container">
+                                    ${[['🦖','ไดโน่'], ['🦄','ยูนิคอร์น'], ['🐉','มังกร']].map(([p, name]) => `
+                                        <button onclick="pickPetNode(this, '${p}')" class="bg-white p-2 rounded-xl border-2 ${state.player.pet === p ? 'border-pink-400 bg-pink-50/50' : 'border-slate-100'} btn-3d shadow-sm flex flex-col items-center">
+                                            <span>${p}</span>
+                                            <span class="text-[10px] font-bold text-slate-500 mt-0.5">${name}</span>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="handleLoginProcess()" class="w-full mt-6 bg-gradient-to-r from-amber-400 via-orange-400 to-pink-500 text-white font-extrabold py-3.5 rounded-2xl btn-3d shadow-md text-base tracking-wide hover:brightness-105">เริ่มต้นผจญภัย! 🚀</button>
+
+                        <div class="mt-4 border-t border-dashed border-slate-200 pt-3 flex justify-between items-center bg-amber-50/60 p-2.5 rounded-xl">
+                            <span class="text-xs font-bold text-amber-800"><i class="fa-solid fa-gift animate-bounce text-amber-500"></i> ของรางวัลรายวัน</span>
+                            <button id="daily-claim-btn" onclick="executeDailyClaim()" class="bg-amber-400 text-white text-xs font-bold px-4 py-1.5 rounded-lg btn-3d shadow-sm">รับเหรียญ</button>
+                        </div>
+                    </div>
+                `;
+                verifyDailyRewardCooldownStatus();
+            }
+            
+            else if (targetScreen === 'map') {
+                updateTopBarUI();
+                changeCompanionTalk(`สวัสดีจ้าคุณผู้กล้า ${state.player.name}! กดเลือกโลกเพื่อผจญภัยหาตัวอักษรและฝึกโฟนิกส์กันเถอะ สะสมดาวให้ครบเพื่อปลดล็อกเกาะต่อไปนะ!`);
+
+                let mapCardsHtml = WORLDS.map(w => {
+                    const lockState = state.player.stars < w.minStars;
+                    return `
+                        <div class="glass-panel p-4 rounded-3xl flex flex-col justify-between items-center border-2 ${lockState ? 'bg-slate-200/50 border-slate-300 opacity-60' : 'bg-gradient-to-b ' + w.gradient + ' text-white border-white/50'} shadow-md relative overflow-hidden text-center h-48">
+                            ${lockState ? `
+                                <div class="absolute inset-0 bg-slate-900/10 flex flex-col items-center justify-center text-slate-600 z-10">
+                                    <i class="fa-solid fa-lock text-3xl mb-1 text-slate-500"></i>
+                                    <p class="text-[10px] font-bold bg-white/90 text-slate-700 px-2 py-0.5 rounded-full shadow-sm"><i class="fa-solid fa-star text-amber-400"></i> ต้องใช้ดาว ${w.minStars} ดวง</p>
+                                </div>
+                            ` : ''}
+                            <div class="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-3xl shadow-sm filter drop-shadow mt-1">${w.icon}</div>
+                            <div>
+                                <h3 class="font-extrabold text-sm tracking-wide md:text-base">${w.name}</h3>
+                                <p class="text-[10px] md:text-xs opacity-90 font-medium">ตัวอักษรประจำด่าน: ${w.letters[0]} ถึง ${w.letters[w.letters.length-1]}</p>
+                            </div>
+                            <button onclick="enterAdventureWorld(${w.id})" class="w-full ${lockState ? 'bg-slate-300' : 'bg-white text-slate-800 pulse-glow'} font-extrabold text-xs py-2 rounded-xl btn-3d shadow-md" ${lockState ? 'disabled' : ''}>เข้าสู่เกาะ ➔</button>
+                        </div>
+                    `;
+                }).join('');
+
+                container.innerHTML = `
+                    <div class="w-full max-w-4xl px-2">
+                        <div class="text-center mb-4">
+                            <h2 class="text-xl font-extrabold text-slate-700 flex items-center justify-center gap-2"><i class="fa-solid fa-map-location-dot text-emerald-500"></i> แผนที่ดินแดนมหัศจรรย์</h2>
+                            <p class="text-xs font-semibold text-slate-400">เอาชนะมินิเกมครบ 4 ขั้นตอนเพื่อรับดาวประจำด่าน</p>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5 mb-6">
+                            ${mapCardsHtml}
+                        </div>
+                        <div class="flex justify-center gap-3">
+                            <button onclick="renderAppScreen('login')" class="bg-slate-400 text-white text-xs font-bold px-5 py-2.5 rounded-xl btn-3d shadow-md"><i class="fa-solid fa-arrow-left"></i> กลับหน้าแรก</button>
+                            <button onclick="evaluateCertificateStatus()" class="bg-gradient-to-r from-purple-500 to-indigo-600 text-white text-xs font-bold px-5 py-2.5 rounded-xl btn-3d shadow-md flex items-center gap-1.5 shadow-indigo-200"><i class="fa-solid fa-award text-sm"></i> รับเกียรติบัตรเกียรติยศ</button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function pickHeroNode(el, av) {
+            state.player.avatar = av;
+            document.querySelectorAll('#avatar-container button').forEach(b => b.className = "bg-white p-2 rounded-xl border-2 border-slate-100 btn-3d shadow-sm");
+            el.className = "bg-indigo-50/50 p-2 rounded-xl border-2 border-indigo-400 btn-3d shadow-sm";
+            gameAudio.click();
+        }
+
+        function pickPetNode(el, p) {
+            state.player.pet = p;
+            document.querySelectorAll('#pet-container button').forEach(b => b.className = "bg-white p-2 rounded-xl border-2 border-slate-100 btn-3d shadow-sm flex flex-col items-center");
+            el.className = "bg-pink-50/50 p-2 rounded-xl border-2 border-pink-400 btn-3d shadow-sm flex flex-col items-center";
+            gameAudio.click();
+        }
+
+        function handleLoginProcess() {
+            const name = document.getElementById('player-name-inp').value.trim();
+            if(!name) { alert('กรุณากรอกชื่อตัวละครผู้กล้าก่อนนะค้าบเด็กๆ!'); return; }
+            state.player.name = name;
+            if(!state.history.some(x => x.name === state.player.name)) {
+                state.history.push({ name: state.player.name, score: 0, plays: 0 });
+            }
+            saveStateToStorage();
+            renderAppScreen('map');
+        }
+
+        function verifyDailyRewardCooldownStatus() {
+            const btn = document.getElementById('daily-claim-btn');
+            if(state.dailyCooldown) {
+                const elapsed = Date.now() - parseInt(state.dailyCooldown);
+                if(elapsed < 24 * 60 * 60 * 1000) {
+                    btn.disabled = true;
+                    btn.className = "bg-slate-200 text-slate-400 text-[10px] px-3 py-1.5 rounded-lg";
+                    btn.innerText = "รับแล้ววันนี้";
+                }
+            }
+        }
+
+        function executeDailyClaim() {
+            state.player.coins += 50;
+            state.dailyCooldown = Date.now().toString();
+            saveStateToStorage();
+            updateTopBarUI();
+            gameAudio.victory();
+            triggerConfettiBurst();
+            alert('🎉 หนูได้รับรางวัลเช็คอินรายวันฟรี 50 เหรียญทอง!');
+            verifyDailyRewardCooldownStatus();
+        }
+
+        function enterAdventureWorld(worldId) {
+            state.currentWorld = WORLDS.find(w => w.id === worldId);
+            state.currentStageIdx = 0;
+            triggerSubGameStage();
+        }
+
+        function triggerSubGameStage() {
+            const container = document.getElementById('game-container');
+            let stageProgressHeader = `
+                <div class="w-full max-w-xl mb-4 bg-white/80 px-3 py-2 rounded-2xl border flex justify-between items-center text-xs font-bold text-slate-500 shadow-sm">
+                    <span class="text-indigo-600 flex items-center gap-1"><span class="text-base">${state.currentWorld.icon}</span> ${state.currentWorld.name}</span>
+                    <div class="flex gap-2">
+                        ${[0,1,2,3].map(i => `
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center border-2 text-[11px] ${state.currentStageIdx === i ? 'bg-amber-400 border-amber-500 text-white animate-pulse' : state.currentStageIdx > i ? 'bg-emerald-400 border-emerald-500 text-white' : 'bg-slate-100 border-slate-200'}">${i+1}</div>
+                        `).join('')}
+                    </div>
+                    <button onclick="renderAppScreen('map')" class="text-slate-300 hover:text-red-500 transition-colors"><i class="fa-solid fa-circle-xmark text-lg"></i></button>
+                </div>
+            `;
+            if (state.currentStageIdx === 0) compileMatchGameStage(container, stageProgressHeader);
+            else if (state.currentStageIdx === 1) compileListeningQuizStage(container, stageProgressHeader);
+            else if (state.currentStageIdx === 2) compileMemoryFlipStage(container, stageProgressHeader);
+            else if (state.currentStageIdx === 3) compileBossBattleStage(container, stageProgressHeader);
+        }
+
+        function proceedToNextStage() {
+            gameAudio.victory();
+            triggerConfettiBurst();
+            state.currentStageIdx++;
+            if(state.currentStageIdx > 3) {
+                state.player.stars += 3; state.player.coins += 100;
+                if(!state.player.clearedWorlds.includes(state.currentWorld.id)) {
+                    state.player.clearedWorlds.push(state.currentWorld.id);
+                }
+                let hUser = state.history.find(x => x.name === state.player.name);
+                if(hUser) {
+                    hUser.score = Math.max(hUser.score, state.player.stars * 10);
+                    hUser.plays += 1;
+                }
+                saveStateToStorage();
+                changeCompanionTalk(`เก่งยอดเยี่ยมที่สุดเลย! หนูพิชิตเกาะ ${state.currentWorld.name} สำเร็จและได้รับดาวเพิ่ม 3 ดวงแล้ว!`);
+                setTimeout(() => renderAppScreen('map'), 2200);
+            } else {
+                changeCompanionTalk(`ยินดีด้วยจ้า ตอบถูกหมดเลย! มาลุยด่านขั้นต่อไปกันต่อเถอะ!`);
+                setTimeout(() => triggerSubGameStage(), 1500);
+            }
+        }
+
+        let leftMatchTarget = null, rightMatchTarget = null;
+        function compileMatchGameStage(container, headerHtml) {
+            changeCompanionTalk(`มินิเกมจับคู่ภาพ: แตะรูปภาพสิ่งของฝั่งซ้าย แล้วหาตัวอักษรภาษาอังกฤษที่เป็นตัวแรกของคำศัพท์ฝั่งขวาให้ตรงกันนะ!`);
+            const listLeft = [...state.currentWorld.letters].sort(() => Math.random() - 0.5);
+            const listRight = [...state.currentWorld.letters].sort(() => Math.random() - 0.5);
+            leftMatchTarget = null; rightMatchTarget = null;
+            container.innerHTML = `
+                ${headerHtml}
+                <div class="w-full max-w-xl glass-panel p-5 rounded-3xl border-2 border-white text-center shadow-lg">
+                    <p class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-object-group text-pink-500"></i> ขั้นที่ 1: จับคู่รูปภาพและอักษรนำแรก</p>
+                    <div class="grid grid-cols-2 gap-6" id="match-zone-grid">
+                        <div class="flex flex-col gap-2.5">${listLeft.map(l => `<button data-ans="${l}" onclick="executeSelectMatchNode(this, 'left')" class="bg-white p-4 text-3xl rounded-2xl border-2 border-slate-100 btn-3d shadow-sm h-16 flex justify-center items-center">${getWordData(l).emoji}</button>`).join('')}</div>
+                        <div class="flex flex-col gap-2.5">${listRight.map(l => `<button data-ans="${l}" onclick="executeSelectMatchNode(this, 'right')" class="bg-white p-4 text-2xl font-extrabold text-indigo-600 rounded-2xl border-2 border-slate-100 btn-3d shadow-sm h-16 flex justify-center items-center">${l}</button>`).join('')}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function executeSelectMatchNode(btn, columnSide) {
+            gameAudio.click();
+            if (columnSide === 'left') {
+                document.querySelectorAll('#match-zone-grid div:first-child button').forEach(b => b.className = "bg-white p-4 text-3xl rounded-2xl border-2 border-slate-100 btn-3d shadow-sm h-16 flex justify-center items-center");
+                btn.className = "bg-indigo-50 text-3xl rounded-2xl border-2 border-indigo-400 btn-3d shadow-sm h-16 flex justify-center items-center";
+                leftMatchTarget = btn;
+            } else {
+                document.querySelectorAll('#match-zone-grid div:last-child button').forEach(b => b.className = "bg-white p-4 text-2xl font-extrabold text-indigo-600 rounded-2xl border-2 border-slate-100 btn-3d shadow-sm h-16 flex justify-center items-center");
+                btn.className = "bg-pink-50 text-2xl font-extrabold text-pink-500 rounded-2xl border-2 border-pink-400 btn-3d shadow-sm h-16 flex justify-center items-center";
+                rightMatchTarget = btn;
+            }
+            if (leftMatchTarget && rightMatchTarget) {
+                if (leftMatchTarget.getAttribute('data-ans') === rightMatchTarget.getAttribute('data-ans')) {
+                    gameAudio.correct();
+                    speakPhonics(getWordData(leftMatchTarget.getAttribute('data-ans')).word);
+                    leftMatchTarget.style.visibility = 'hidden';
+                    rightMatchTarget.style.visibility = 'hidden';
+                    leftMatchTarget = null; rightMatchTarget = null;
+                    if (Array.from(document.querySelectorAll('#match-zone-grid div:first-child button')).every(b => b.style.visibility === 'hidden')) {
+                        proceedToNextStage();
+                    }
+                } else {
+                    playWrongAnswerShake();
+                    leftMatchTarget.className = "bg-white p-4 text-3xl rounded-2xl border-2 border-slate-100 btn-3d shadow-sm h-16 flex justify-center items-center";
+                    rightMatchTarget.className = "bg-white p-4 text-2xl font-extrabold text-indigo-600 rounded-2xl border-2 border-slate-100 btn-3d shadow-sm h-16 flex justify-center items-center";
+                    leftMatchTarget = null; rightMatchTarget = null;
+                }
+            }
+        }
+
+        let voiceLetterQuizAns = "";
+        function compileListeningQuizStage(container, headerHtml) {
+            const arr = state.currentWorld.letters;
+            voiceLetterQuizAns = arr[Math.floor(Math.random() * arr.length)];
+            let choices = [voiceLetterQuizAns];
+            let fullAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('');
+            while(choices.length < 4) {
+                let r = fullAlphabet[Math.floor(Math.random() * fullAlphabet.length)];
+                if(!choices.includes(r)) choices.push(r);
+            }
+            choices.sort(() => Math.random() - 0.5);
+            changeCompanionTalk(`ด่านทดสอบการฟังโฟนิกส์: กดที่ปุ่มลำโพงเพื่อฟังเสียงสะกดคำ แล้วหนูๆ เลือกตัวอักษรให้ถูกต้องสิจ๊ะ`);
+            container.innerHTML = `
+                ${headerHtml}
+                <div class="w-full max-w-xl glass-panel p-6 rounded-3xl border-2 border-white text-center shadow-lg">
+                    <p class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-volume-high text-sky-400"></i> ขั้นที่ 2: ฟังเสียงปริศนาสะกดนำคำ</p>
+                    <button onclick="triggerSpeechVoiceSynth()" class="w-20 h-20 bg-gradient-to-tr from-sky-400 to-blue-500 text-white text-3xl rounded-full mb-6 btn-3d shadow-md mx-auto flex items-center justify-center animate-bounce">
+                        <i class="fa-solid fa-volume-up"></i>
+                    </button>
+                    <div class="grid grid-cols-2 gap-3.5">
+                        ${choices.map(c => `<button onclick="verifyListeningAnswer('${c}')" class="bg-white hover:bg-slate-50 py-4 font-extrabold text-2xl text-slate-700 rounded-2xl border-2 border-slate-100 btn-3d shadow-sm">${c}</button>`).join('')}
+                    </div>
+                </div>
+            `;
+            setTimeout(() => triggerSpeechVoiceSynth(), 500);
+        }
+
+        function triggerSpeechVoiceSynth() {
+            speakPhonics(`Can you find the alphabet starting with ${voiceLetterQuizAns}. Again, ${voiceLetterQuizAns}.`);
+        }
+
+        function verifyListeningAnswer(selectedAnswer) {
+            if(selectedAnswer === voiceLetterQuizAns) proceedToNextStage();
+            else playWrongAnswerShake();
+        }
+
+        let firstFlippedObj = null, secondFlippedObj = null;
+        let isMemoryGridLocked = false;
+        function compileMemoryFlipStage(container, headerHtml) {
+            changeCompanionTalk(`เกมแผ่นป้ายความจำ: พลิกเปิดหน้าแผ่นป้ายเพื่อมองหาคู่ที่มีความสัมพันธ์กัน ระหว่าง ตัวอักษร และ รูปภาพสิ่งของ นะเด็กๆ!`);
+            const chosenLetters = state.currentWorld.letters.slice(0, 3);
+            let deck = [];
+            chosenLetters.forEach(l => {
+                deck.push({ id: l, category: 'letter', value: l });
+                deck.push({ id: l, category: 'emoji', value: getWordData(l).emoji });
+            });
+            deck.sort(() => Math.random() - 0.5);
+            firstFlippedObj = null; secondFlippedObj = null; isMemoryGridLocked = false;
+            container.innerHTML = `
+                ${headerHtml}
+                <div class="w-full max-w-md glass-panel p-5 rounded-3xl border-2 border-white text-center shadow-lg">
+                    <p class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-brain text-emerald-400"></i> ขั้นที่ 3: จับคู่แผ่นป้ายวัดความจำ</p>
+                    <div class="grid grid-cols-3 gap-3" id="memory-deck-grid">
+                        ${deck.map(card => `
+                            <div onclick="executeFlipCardTurn(this, '${card.id}', '${card.category}')" class="h-24 bg-transparent cursor-pointer rounded-xl perspective-1000">
+                                <div class="card-inner relative w-full h-full text-center rounded-xl border bg-white shadow-sm">
+                                    <div class="card-front absolute inset-0 bg-gradient-to-br from-pink-400 to-indigo-500 rounded-xl flex items-center justify-center text-white font-extrabold text-lg shadow-inner">⭐</div>
+                                    <div class="card-back absolute inset-0 bg-white rounded-xl flex items-center justify-center text-3xl font-extrabold text-slate-700">${card.value}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function executeFlipCardTurn(cardElement, letterId, categoryType) {
+            if (isMemoryGridLocked) return;
+            const innerNode = cardElement.querySelector('.card-inner');
+            if (innerNode.classList.contains('card-flipped')) return;
+            gameAudio.click();
+            innerNode.classList.add('card-flipped');
+            if (!firstFlippedObj) {
+                firstFlippedObj = { element: cardElement, id: letterId, cat: categoryType };
+            } else {
+                secondFlippedObj = { element: cardElement, id: letterId, cat: categoryType };
+                if (firstFlippedObj.id === secondFlippedObj.id && firstFlippedObj.cat !== secondFlippedObj.cat) {
+                    gameAudio.correct();
+                    speakPhonics(getWordData(letterId).word);
+                    firstFlippedObj = null; secondFlippedObj = null;
+                    if (Array.from(document.querySelectorAll('.card-inner')).every(c => c.classList.contains('card-flipped'))) {
+                        proceedToNextStage();
+                    }
+                } else {
+                    isMemoryGridLocked = true;
+                    playWrongAnswerShake();
+                    setTimeout(() => {
+                        firstFlippedObj.element.querySelector('.card-inner').classList.remove('card-flipped');
+                        secondFlippedObj.element.querySelector('.card-inner').classList.remove('card-flipped');
+                        firstFlippedObj = null; secondFlippedObj = null; isMemoryGridLocked = false;
+                    }, 1100);
+                }
+            }
+        }
+
+        let currentBossHp = 100;
+        let activeBossLetterAns = "";
+        function compileBossBattleStage(container, headerHtml) {
+            currentBossHp = 100;
+            changeCompanionTalk(`เตือนภัยบอสโผล่! ช่วยกันจู่โจมลดพลังบอสปีศาจ โดยเลือกคำศัพท์ให้สัมพันธ์กับภาพปริศนานะครับ!`);
+            renderBossQuestionCycle(container, headerHtml);
+        }
+
+        function renderBossQuestionCycle(container, headerHtml) {
+            const letters = state.currentWorld.letters;
+            activeBossLetterAns = letters[Math.floor(Math.random() * letters.length)];
+            const answerPayload = getWordData(activeBossLetterAns);
+            let wrongOptions = [];
+            let fullKeys = Object.keys(DEFAULT_WORDS);
+            while(wrongOptions.length < 2) {
+                let rK = fullKeys[Math.floor(Math.random() * fullKeys.length)];
+                if(rK !== activeBossLetterAns && !wrongOptions.includes(rK)) wrongOptions.push(rK);
+            }
+            let choices = [activeBossLetterAns, ...wrongOptions].sort(() => Math.random() - 0.5);
+            container.innerHTML = `
+                ${headerHtml}
+                <div class="w-full max-w-xl glass-panel p-5 rounded-3xl border-2 border-white text-center shadow-xl">
+                    <div class="flex justify-between items-center mb-3 bg-red-500/10 p-3 rounded-2xl border border-red-200">
+                        <span class="text-xs font-bold text-red-600 animate-pulse flex items-center gap-1">😈 มอนสเตอร์จอมป่วน</span>
+                        <div class="w-1/2 bg-slate-200 rounded-full h-3.5 overflow-hidden border">
+                            <div id="hp-bar-fill" class="bg-gradient-to-r from-red-500 to-orange-400 h-full transition-all duration-300" style="width: ${currentBossHp}%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white/90 py-5 rounded-2xl border border-purple-100 shadow-inner mb-4">
+                        <div class="text-6xl mb-2 filter drop-shadow animate-float">${answerPayload.emoji}</div>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">ภาพนี้ตรงกับคำศัพท์ภาษาอังกฤษคำไหนนะ?</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        ${choices.map(c => `<button onclick="executeBossAttackStrike('${c}')" class="bg-white hover:bg-indigo-50 p-3.5 rounded-xl border-2 border-slate-100 text-slate-700 font-extrabold text-xs md:text-sm btn-3d shadow-sm flex flex-col items-center">${getWordData(c).word}</button>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function executeBossAttackStrike(selectedKey) {
+            const container = document.getElementById('game-container');
+            if (selectedKey === activeBossLetterAns) {
+                currentBossHp -= 50;
+                gameAudio.correct();
+                speakPhonics(getWordData(activeBossLetterAns).word);
+                const hp = document.getElementById('hp-bar-fill');
+                if(hp) hp.style.width = currentBossHp + '%';
+                if (currentBossHp <= 0) {
+                    proceedToNextStage();
+                } else {
+                    changeCompanionTalk(`ดาเมจพุ่งกระฉูด! บอสโดนโจมตีเจ็บหนักแล้ว ตอบถูกอีกข้อเดียวชนะเลย!`);
+                    setTimeout(() => renderBossQuestionCycle(container, document.querySelector('#game-container > div').outerHTML.split('</div>')[0] + '</div>'), 1000);
+                }
+            } else {
+                playWrongAnswerShake();
+                changeCompanionTalk(`อ๊ะโอ! บอสสามารถบล็อกป้องกันไว้ได้ หนูๆ ลองเลือกทบทวนคำศัพท์ใหม่อีกทีจ้า`);
+            }
+        }
+
+        function evaluateCertificateStatus() {
+            if (state.player.stars < 15) {
+                alert(`🏅 การแจ้งเตือน: ผู้กล้าต้องพิชิตด่านเก็บสะสมดาวให้ได้อย่างน้อย 15 ดวงก่อนเพื่อรับใบประกาศนียบัตร (ตอนนี้หนูมี ${state.player.stars} ดวง)`);
+                return;
+            }
+            const container = document.getElementById('game-container');
+            const formattedDate = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+            container.innerHTML = `
+                <div class="w-full max-w-2xl bg-amber-50/40 p-8 rounded-3xl border-[14px] border-amber-400 text-center shadow-2xl relative" id="cert-print-area">
+                    <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-gradient-to-tr from-amber-400 to-yellow-500 rounded-full flex items-center justify-center text-4xl text-white shadow-lg border-4 border-white animate-float">🏆</div>
+                    <h2 class="text-3xl font-extrabold text-amber-600 uppercase tracking-widest mt-4">Certificate of Achievement</h2>
+                    <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">ใบประกาศเกียรติคุณยอดผู้กล้าเยาวชนปฐมวัย</p>
+                    <div class="my-8">
+                        <p class="text-slate-500 text-xs font-semibold">ขอรับรองอย่างสมเกียรติว่าผู้เรียนคนเก่ง</p>
+                        <h3 class="text-3xl font-bold text-slate-800 border-b-2 border-dashed border-amber-300 inline-block px-10 py-1.5 my-2 font-prompt">${state.player.name}</h3>
+                        <p class="text-slate-600 text-xs font-semibold max-w-md mx-auto mt-2 leading-relaxed">ได้ผจญภัยเรียนรู้จนสำเร็จหลักสูตรจดจำอักษร A-Z โฟนิกส์เพื่อการเรียนรู้อย่างครบบริบูรณ์ สะสมดาวและเหรียญรางวัลครบตามมาตรฐานหลักสูตรโรงเรียนปฐมศึกษา</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto bg-white/80 p-3 rounded-xl border border-amber-200 mb-6 text-xs font-bold text-amber-900 shadow-inner">
+                        <div><p class="text-[10px] text-amber-500 font-bold">สถิติดาวสะสม</p><p class="text-base font-extrabold">${state.player.stars} ดวงสำเร็จ</p></div>
+                        <div><p class="text-[10px] text-amber-500 font-bold">ประทับตราวันที่</p><p class="text-sm font-semibold mt-0.5">${formattedDate}</p></div>
+                    </div>
+                    <div class="flex gap-2 justify-center no-print">
+                        <button onclick="window.print()" class="bg-amber-400 hover:bg-amber-500 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl btn-3d shadow-md"><i class="fa-solid fa-print"></i> พิมพ์ใบประกาศ</button>
+                        <button onclick="renderAppScreen('map')" class="bg-slate-400 hover:bg-slate-500 text-white font-bold text-xs px-6 py-2.5 rounded-xl btn-3d shadow-md">กลับหน้าแผนที่</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openAdminModal() {
+            gameAudio.click();
+            document.getElementById('admin-modal').classList.remove('hidden');
+            document.getElementById('admin-auth').classList.remove('hidden');
+            document.getElementById('admin-content').classList.add('hidden');
+            document.getElementById('admin-pass-input').value = "";
+        }
+
+        function closeAdminModal() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            if (document.getElementById('admin-pass-input').value === '1234') {
+                gameAudio.correct();
+                document.getElementById('admin-auth').classList.add('hidden');
+                document.getElementById('admin-content').classList.remove('hidden');
+                compileAdminControlDashboardData();
+            } else {
+                alert('รหัสผ่านไม่ถูกต้องจ้าคุณครู ลองอีกครั้งนะคร้าบ!');
+            }
+        }
+
+        function compileAdminControlDashboardData() {
+            document.getElementById('dash-total-players').innerText = state.history.length;
+            const topScore = state.history.reduce((max, h) => h.score > max ? h.score : max, 0);
+            document.getElementById('dash-top-score').innerText = topScore;
+            const totalPlays = state.history.reduce((sum, h) => sum + h.plays, 0);
+            document.getElementById('dash-total-plays').innerText = totalPlays;
+
+            const listContainer = document.getElementById('word-editor-list');
+            listContainer.innerHTML = Object.keys(DEFAULT_WORDS).map(letter => {
+                const item = getWordData(letter);
+                return `
+                    <div class="flex items-center gap-2 bg-white p-2 rounded-xl border text-xs shadow-sm">
+                        <span class="font-extrabold text-indigo-600 text-sm w-4">${letter}</span>
+                        <input type="text" value="${item.emoji}" onchange="modifyCustomWordStorage('${letter}', 'emoji', this.value)" class="w-8 text-center border rounded py-0.5">
+                        <input type="text" value="${item.word}" onchange="modifyCustomWordStorage('${letter}', 'word', this.value)" class="w-24 px-1.5 border rounded font-semibold text-slate-700 py-0.5">
+                    </div>
+                `;
+            }).join('');
+
+            setTimeout(() => {
+                const ctx = document.getElementById('adminChart').getContext('2d');
+                if (activeChart) activeChart.destroy();
+                const names = state.history.map(x => x.name);
+                const marks = state.history.map(x => x.score);
+                activeChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: names.length ? names : ['ยังไม่มีข้อมูลเด็ก'],
+                        datasets: [{
+                            label: 'ระดับคะแนนผู้เรียน (แต้ม)',
+                            data: marks.length ? marks : [0],
+                            backgroundColor: 'rgba(79, 70, 229, 0.45)',
+                            borderColor: 'rgba(79, 70, 229, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true } }
+                    }
+                });
+            }, 120);
+        }
+
+        function modifyCustomWordStorage(letter, fieldKey, newVal) {
+            if (!state.customWords[letter]) {
+                state.customWords[letter] = { ...DEFAULT_WORDS[letter] };
+            }
+            state.customWords[letter][fieldKey] = newVal.trim();
+            saveStateToStorage();
+        }
+
+        function resetSystemDatabase() {
+            if (confirm('🚨 โปรดระวัง! คุณครูต้องการรีเซ็ตข้อมูลนักเรียน สถิติ รวมถึงคำศัพท์ทั้งหมดกลับเป็นศูนย์ใช่หรือไม่?')) {
+                localStorage.clear();
+                state = {
+                    player: { name: "", avatar: "👦", pet: "🦖", stars: 0, coins: 0, clearedWorlds: [] },
+                    customWords: {}, history: [], dailyCooldown: null, currentWorld: null, currentStageIdx: 0
+                };
+                saveStateToStorage();
+                closeAdminModal();
+                renderAppScreen('login');
+                updateTopBarUI();
+                alert('ระบบรีเซ็ตฐานข้อมูลเรียบร้อยแล้วครับคุณครู!');
+            }
+        }
+    </script>
+</body>
+</html>
