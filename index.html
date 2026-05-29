@@ -489,64 +489,18 @@
     <div id="mainScreen" class="game-screen active">
         <div class="brand-header">
             <!-- ดึงโลโก้จรวดขี่รุ้งตามโครงสร้างโมเดลตัวอย่าง -->
-            <!-- LOGO จรวดพาสเทลสำหรับเด็กเวอร์ชันอัปเกรด -->
-            <svg class="brand-logo" viewBox="0 0 120 120" width="100" height="100" style="overflow: visible;">
+            <svg class="brand-logo" viewBox="0 0 100 100" width="100" height="100">
                 <defs>
-                    <!-- แสงเงา Gradient ให้ดูมีมิติซอฟต์ๆ พาสเทล -->
-                    <linearGradient id="rocketBody" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#ff9a9e;" />
-                        <stop offset="100%" style="stop-color:#fecfef;" />
+                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff758c;" />
+                        <stop offset="100%" style="stop-color:#ff7eb3;" />
                     </linearGradient>
-                    <linearGradient id="rocketTip" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#ff5858;" />
-                        <stop offset="100%" style="stop-color:#f093fb;" />
-                    </linearGradient>
-                    <linearGradient id="abcBlock" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#4facfe;" />
-                        <stop offset="100%" style="stop-color:#00f2fe;" />
-                    </linearGradient>
-                    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
-                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#8a94d4" flood-opacity="0.3"/>
-                    </filter>
                 </defs>
-
-                <g filter="url(#softShadow)">
-                    <!-- เอฟเฟกต์ไฟท้ายจรวดและดวงดาวความเร็ว -->
-                    <path d="M35,85 Q20,105 15,110 Q25,100 35,85 Z" fill="#ff4757" />
-                    <path d="M40,80 Q28,98 25,102 Q32,92 40,80 Z" fill="#ffa502" />
-                    <circle cx="20" cy="85" r="3" fill="#fff" opacity="0.8" />
-                    <circle cx="95" cy="35" r="2.5" fill="#fff" opacity="0.8" />
-                    
-                    <!-- ปีกซ้าย-ขวา ของจรวด -->
-                    <path d="M40,75 L20,80 L35,60 Z" fill="#f368e0" />
-                    <path d="M65,50 L80,65 L60,70 Z" fill="#f368e0" />
-
-                    <!-- ตัวถังจรวดหลักหลัก (ทรงแคปซูลเฉียงทะยานฟ้า) -->
-                    <path d="M35,80 C45,55 65,35 85,25 C75,45 55,65 35,80 Z" fill="url(#rocketBody)" />
-                    
-                    <!-- หัวจรวด -->
-                    <path d="M70,40 C75,35 85,25 85,25 C85,25 75,35 70,40 Z" fill="url(#rocketTip)" />
-                    <path d="M73,37 Q83,23 85,25 Q87,27 77,37 Z" fill="url(#rocketTip)" />
-
-                    <!-- หน้าต่างวงกลมกลางจรวด -->
-                    <circle cx="55" cy="55" r="8" fill="#dfe4ea" stroke="#fff" stroke-width="2" />
-                    <circle cx="53" cy="53" r="5" fill="#74b9ff" />
-
-                    <!-- บล็อกของเล่นลูกบาศก์ตัวอักษร 'abc' ที่จรวดแบกมา -->
-                    <g transform="translate(15, 15) rotate(-10)">
-                        <!-- มิติกล่อง 3D กล่องหลัก -->
-                        <rect x="15" y="15" width="26" height="26" rx="6" fill="url(#abcBlock)" stroke="#fff" stroke-width="2" />
-                        <!-- ฝากล่องด้านบนให้ดูเป็น 3D -->
-                        <path d="M15,15 L25,7 L51,7 L41,15 Z" fill="#74b9ff" opacity="0.7" />
-                        <!-- ตัวอักษร abc น่ารักๆ ตรงกลางบล็อก -->
-                        <text x="28" y="33" fill="white" font-family="'Chakra Petch', sans-serif" font-weight="bold" font-size="13" text-anchor="middle">abc</text>
-                    </g>
-                    
-                    <!-- เส้นรุ้งพุ่งตามก้นจรวด (Rainbow Trail) -->
-                    <path d="M15,95 Q5,105 0,110" stroke="#ff7675" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
-                    <path d="M18,98 Q10,108 5,113" stroke="#ffeaa7" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
-                    <path d="M21,101 Q15,111 10,116" stroke="#55efc4" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
-                </g>
+                <path d="M20,80 Q50,20 80,20 Q80,50 20,80 Z" fill="url(#grad)" />
+                <rect x="15" y="15" width="25" height="25" rx="5" fill="#3b82f6" transform="rotate(-15 25 25)"/>
+                <text x="21" y="32" fill="white" font-family="sans-serif" font-weight="bold" font-size="12" transform="rotate(-15 25 25)">abc</text>
+                <path d="M20,80 Q10,90 5,95 Q15,85 20,80" stroke="#ff4757" stroke-width="4" fill="none" />
+                <path d="M15,85 Q5,95 0,100" stroke="#ffa502" stroke-width="3" fill="none" />
             </svg>
             <h1 class="brand-title">A-Z Adventure</h1>
             <div class="brand-badge">ผจญภัยโลกตัวักษรอังกฤษ 🎉</div>
