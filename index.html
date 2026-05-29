@@ -148,13 +148,13 @@
         <div class="bg-white rounded-3xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl border-4 border-indigo-200">
             <div class="flex justify-between items-center mb-4 border-b pb-2">
                 <h3 class="text-lg md:text-xl font-bold text-indigo-700 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders"></i> ระบบควบคุมสำหรับคุณครู (Admin)
+                    <i class="fa-solid fa-sliders"></i> ระบบควบคุมสำหรับ(Admin)
                 </h3>
                 <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-3xl font-light">&times;</button>
             </div>
             
             <div id="admin-auth" class="text-center py-6">
-                <p class="text-slate-600 mb-4 font-semibold text-sm">กรุณากรอกรหัสผ่านคุณครูเพื่อเข้าใช้งาน (รหัสผ่านเริ่มต้น: 1234)</p>
+                <p class="text-slate-600 mb-4 font-semibold text-sm">กรุณากรอกรหัสผ่านเพื่อเข้าใช้งาน (รหัสผ่านเริ่มต้น: 1234)</p>
                 <input type="password" id="admin-pass-input" class="border-3 border-indigo-100 rounded-2xl px-4 py-2.5 text-center text-xl font-bold tracking-widest focus:outline-indigo-400 mb-4 w-48 shadow-inner" placeholder="••••">
                 <br>
                 <button onclick="verifyAdminPassword()" class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl btn-3d shadow-md hover:bg-indigo-700 text-sm">ยืนยันรหัสผ่าน</button>
@@ -163,7 +163,7 @@
             <div id="admin-content" class="hidden space-y-6">
                 <div class="grid grid-cols-3 gap-3 text-center">
                     <div class="bg-indigo-50/60 p-3 rounded-xl border border-indigo-100">
-                        <p class="text-[11px] text-indigo-600 font-bold">นักเรียนทั้งหมด</p>
+                        <p class="text-[11px] text-indigo-600 font-bold">ผู้เล่น</p>
                         <p id="dash-total-players" class="text-xl font-extrabold text-indigo-800">0</p>
                     </div>
                     <div class="bg-amber-50/60 p-3 rounded-xl border border-amber-100">
@@ -177,7 +177,7 @@
                 </div>
 
                 <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-chart-bar text-indigo-500"></i> แผนภูมิเปรียบเทียบคะแนนดาวของเด็กๆ</p>
+                    <p class="text-xs font-bold text-slate-500 mb-2 flex items-center gap-1.5"><i class="fa-solid fa-chart-bar text-indigo-500"></i> แผนภูมิเปรียบเทียบคะแนนดาวของผู้เล่น</p>
                     <div class="h-44 relative"><canvas id="adminChart"></canvas></div>
                 </div>
 
@@ -190,7 +190,7 @@
 
                 <div class="border-t pt-4 flex justify-between items-center bg-red-50 p-3 rounded-xl border border-red-100">
                     <div>
-                        <p class="text-xs font-bold text-red-700">ล้างสถิติข้อมูลของห้องเรียน</p>
+                        <p class="text-xs font-bold text-red-700">ล้างสถิติข้อมูลของผู้เล่น</p>
                         <p class="text-[10px] text-red-400">ลบข้อมูลผู้เล่น สถิติดาว และคำศัพท์ดัดแปลงทั้งหมด</p>
                     </div>
                     <button onclick="resetSystemDatabase()" class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-xl btn-3d shadow-md">รีเซ็ตทั้งหมด</button>
