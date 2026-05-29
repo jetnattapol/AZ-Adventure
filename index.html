@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>A-Z Adventure World 🌈🚀</title>
-    <!-- Google Fonts & FontAwesome -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Mitr:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js สำหรับระบบครู -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -105,9 +103,11 @@
             margin-bottom: 25px;
         }
         .brand-logo {
-            width: 90px;
+            width: 110px;
+            height: 110px;
             margin-bottom: 5px;
             animation: bounce 3s infinite;
+            overflow: visible;
         }
         .brand-title {
             font-size: 42px;
@@ -471,7 +471,6 @@
 </head>
 <body>
 
-    <!-- ฉากหลังตกแต่งน่ารักๆ -->
     <div class="deco-cloud-1"><i class="fa-solid fa-cloud" style="color: white; font-size: 60px;"></i></div>
     <div class="deco-cloud-2"><i class="fa-solid fa-cloud" style="color: white; font-size: 80px;"></i></div>
     <div class="deco-star-1"><i class="fa-solid fa-star"></i></div>
@@ -479,31 +478,55 @@
     <div class="deco-rocket"><i class="fa-solid fa-rocket"></i></div>
     <div class="deco-sprout"><i class="fa-solid fa-seedling"></i></div>
 
-    <!-- แผงควบคุมขวาบน -->
     <div class="top-controls">
         <button class="circle-btn btn-admin-gate" onclick="openAdminPasswordModal()" title="ระบบคุณครู"><i class="fa-solid fa-user-gear"></i></button>
         <button class="circle-btn btn-sound" onclick="toggleMute()" id="soundBtn" title="เปิด/ปิดเสียง"><i class="fa-solid fa-volume-high"></i></button>
     </div>
 
-    <!-- ================= SCREEN 1: หน้าหลัก (ภาพ 1.jpg) ================= -->
     <div id="mainScreen" class="game-screen active">
         <div class="brand-header">
-            <!-- ดึงโลโก้จรวดขี่รุ้งตามโครงสร้างโมเดลตัวอย่าง -->
-            <svg class="brand-logo" viewBox="0 0 100 100" width="100" height="100">
+            <svg class="brand-logo" viewBox="0 0 120 120">
                 <defs>
-                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#ff758c;" />
-                        <stop offset="100%" style="stop-color:#ff7eb3;" />
+                    <linearGradient id="rocketBody" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff9a9e;" />
+                        <stop offset="100%" style="stop-color:#fecfef;" />
                     </linearGradient>
+                    <linearGradient id="rocketTip" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ff5858;" />
+                        <stop offset="100%" style="stop-color:#f093fb;" />
+                    </linearGradient>
+                    <linearGradient id="abcBlock" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4facfe;" />
+                        <stop offset="100%" style="stop-color:#00f2fe;" />
+                    </linearGradient>
+                    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#8a94d4" flood-opacity="0.3"/>
+                    </filter>
                 </defs>
-                <path d="M20,80 Q50,20 80,20 Q80,50 20,80 Z" fill="url(#grad)" />
-                <rect x="15" y="15" width="25" height="25" rx="5" fill="#3b82f6" transform="rotate(-15 25 25)"/>
-                <text x="21" y="32" fill="white" font-family="sans-serif" font-weight="bold" font-size="12" transform="rotate(-15 25 25)">abc</text>
-                <path d="M20,80 Q10,90 5,95 Q15,85 20,80" stroke="#ff4757" stroke-width="4" fill="none" />
-                <path d="M15,85 Q5,95 0,100" stroke="#ffa502" stroke-width="3" fill="none" />
+                <g filter="url(#softShadow)">
+                    <path d="M35,85 Q20,105 15,110 Q25,100 35,85 Z" fill="#ff4757" />
+                    <path d="M40,80 Q28,98 25,102 Q32,92 40,80 Z" fill="#ffa502" />
+                    <circle cx="20" cy="85" r="3" fill="#fff" opacity="0.8" />
+                    <circle cx="95" cy="35" r="2.5" fill="#fff" opacity="0.8" />
+                    <path d="M40,75 L20,80 L35,60 Z" fill="#f368e0" />
+                    <path d="M65,50 L80,65 L60,70 Z" fill="#f368e0" />
+                    <path d="M35,80 C45,55 65,35 85,25 C75,45 55,65 35,80 Z" fill="url(#rocketBody)" />
+                    <path d="M70,40 C75,35 85,25 85,25 C85,25 75,35 70,40 Z" fill="url(#rocketTip)" />
+                    <path d="M73,37 Q83,23 85,25 Q87,27 77,37 Z" fill="url(#rocketTip)" />
+                    <circle cx="55" cy="55" r="8" fill="#dfe4ea" stroke="#fff" stroke-width="2" />
+                    <circle cx="53" cy="53" r="5" fill="#74b9ff" />
+                    <g transform="translate(15, 15) rotate(-10)">
+                        <rect x="15" y="15" width="26" height="26" rx="6" fill="url(#abcBlock)" stroke="#fff" stroke-width="2" />
+                        <path d="M15,15 L25,7 L51,7 L41,15 Z" fill="#74b9ff" opacity="0.7" />
+                        <text x="28" y="33" fill="white" font-family="'Chakra Petch', sans-serif" font-weight="bold" font-size="13" text-anchor="middle">abc</text>
+                    </g>
+                    <path d="M15,95 Q5,105 0,110" stroke="#ff7675" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
+                    <path d="M18,98 Q10,108 5,113" stroke="#ffeaa7" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
+                    <path d="M21,101 Q15,111 10,116" stroke="#55efc4" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.8" />
+                </g>
             </svg>
             <h1 class="brand-title">A-Z Adventure</h1>
-            <div class="brand-badge">ผจญภัยโลกตัวักษรอังกฤษ 🎉</div>
+            <div class="brand-badge">ผจญภัยโลกตัวอักษรอังกฤษ 🎉</div>
         </div>
 
         <div class="cute-card border-yellow">
@@ -550,7 +573,6 @@
         </div>
     </div>
 
-    <!-- ================= SCREEN 2: หน้าลงทะเบียน (ภาพ 4.png) ================= -->
     <div id="registerScreen" class="game-screen">
         <div style="font-size: 60px; margin-bottom: 10px;">📝</div>
         <div class="cute-card border-pink">
@@ -584,11 +606,10 @@
         </div>
     </div>
 
-    <!-- ================= SCREEN 3: แผนที่โลกผจญภัย (ภาพ 5.jpg) ================= -->
     <div id="mapScreen" class="game-screen">
         <div class="player-bar">
             <div class="player-info-meta">
-                <span id="playerAvatarDisplay" style="font-size: 24px;">🐰</span>
+                <span id="playerAvatarDisplay" style="font-size: 24px;">👦</span>
                 <div style="text-align: left; line-height: 1.2;">
                     <div id="playerNameDisplay" style="font-weight: 700; color: #333;">นิทาน</div>
                     <div style="font-size: 11px; color: #666;">
@@ -607,7 +628,6 @@
             <div class="section-title" style="margin-bottom: 10px;"><i class="fa-solid fa-map-location-dot"></i> แผนที่แดนมหัศจรรย์</div>
             
             <div class="map-container">
-                <!-- โลก 1 -->
                 <div class="world-node w1" onclick="alert('ยินดีต้อนรับเข้าสู่ด่านอักษร A-E!')">
                     <div class="node-detail">
                         <div class="node-title">โลก 1 - A-E</div>
@@ -619,18 +639,16 @@
                     <i class="fa-solid fa-lock-open"></i>
                 </div>
                 
-                <!-- โลก 2 -->
                 <div class="world-node w2" onclick="alert('ด่านนี้กำลังจะเปิดเร็วๆ นี้!')">
                     <div class="node-detail">
                         <div class="node-title">โลก 2 - F-J</div>
                         <div class="node-subtitle">Ocean Letters</div>
-                        <div style="font-size: 11px; margin-top: 4px; color: #fffde7;"><i class="fa-solid fa-sparkles"></i> พร้อมออกผจญภัย!</div>
+                        <div style="font-size: 11px; color: #fffde7;"><i class="fa-solid fa-sparkles"></i> พร้อมออกผจญภัย!</div>
                     </div>
                     <i class="fa-solid fa-lock" style="color: #f1c40f;"></i>
                 </div>
 
-                <!-- โลก 3 -->
-                <div class="world-node w3 locked">
+                <div class="world-node w3 locked" onclick="alert('ต้องสะสมดาวให้ครบ 6 ดวงก่อนนะจ๊ะ')">
                     <div class="node-detail">
                         <div class="node-title">โลก 3 - K-O</div>
                         <div class="node-subtitle">Space Alphabet</div>
@@ -639,8 +657,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
 
-                <!-- โลก 4 -->
-                <div class="world-node w4 locked">
+                <div class="world-node w4 locked" onclick="alert('ต้องสะสมดาวให้ครบ 9 ดวงก่อนนะจ๊ะ')">
                     <div class="node-detail">
                         <div class="node-title">โลก 4 - P-T</div>
                         <div class="node-subtitle">Magic Castle</div>
@@ -649,8 +666,7 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
 
-                <!-- โลก 5 -->
-                <div class="world-node w5 locked">
+                <div class="world-node w5 locked" onclick="alert('ต้องสะสมดาวให้ครบ 12 ดวงก่อนนะจ๊ะ')">
                     <div class="node-detail">
                         <div class="node-title">โลก 5 - U-Z</div>
                         <div class="node-subtitle">Dragon Mountain</div>
@@ -666,8 +682,6 @@
         </div>
     </div>
 
-
-    <!-- ================= MODAL: กล่องสุ่มรางวัลประจำวัน (ภาพ 2.png) ================= -->
     <div id="luckyModal" class="modal-overlay">
         <div class="modal-content" style="border: 4px solid #fbc531;">
             <div style="font-size: 65px; margin-bottom: 10px;">🎁</div>
@@ -684,7 +698,6 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: หอเกียรติยศ / ตารางคะแนน (ภาพ 3.png) ================= -->
     <div id="leaderboardModal" class="modal-overlay">
         <div class="modal-content" style="border: 4px solid #626ce6;">
             <div style="font-size: 60px; margin-bottom: 5px;">🏆</div>
@@ -718,7 +731,6 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: หน้าต่างล็อกอินครูผู้สอน (ภาพ 6.jpg) ================= -->
     <div id="adminPasswordModal" class="modal-overlay">
         <div class="modal-content" style="border: 4px solid #5865f2;">
             <div style="font-size: 50px; margin-bottom: 10px;">🔐</div>
@@ -736,7 +748,6 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: DASHBOARD คุณครู + กราฟ (ภาพ 7.jpg) ================= -->
     <div id="adminDashboardModal" class="modal-overlay">
         <div class="modal-content large" style="border: 4px solid #5865f2;">
             <span class="modal-close-x" onclick="closeModal('adminDashboardModal')"><i class="fa-solid fa-xmark"></i></span>
@@ -745,7 +756,6 @@
                 <i class="fa-solid fa-chart-line"></i> Dashboard ของครูผู้สอน
             </h2>
 
-            <!-- ส่วนสรุปสถิติด้านบน -->
             <div class="dash-summary-row">
                 <div class="dash-box box-blue">
                     <span>นร. ทั้งหมด</span>
@@ -761,182 +771,195 @@
                 </div>
             </div>
 
-            <!-- กราฟ Chart.js แสดงผลตามภาพตัวอย่าง 7.jpg -->
             <div class="section-title" style="justify-content: flex-start; font-size: 14px;">
                 <i class="fa-solid fa-chart-bar"></i> การเปรียบเทียบคะแนนนักเรียน
             </div>
             <div class="chart-wrapper">
-                <canvas id="studentChart" height="140"></canvas>
+                <canvas id="scoreChart" height="140"></canvas>
             </div>
 
-            <!-- จัดการคำศัพท์ด่านผจญภัย (CRUD System) -->
             <div class="crud-box">
-                <div class="crud-title"><i class="fa-solid fa-plus-circle"></i> ปรับปรุงคำศัพท์ในด่านผจญภัย</div>
+                <div class="crud-title"><i class="fa-solid fa-folder-plus"></i> เพิ่ม/แก้ไขคลังคำศัพท์ภาษาอังกฤษในเกม</div>
                 <div class="crud-inputs">
-                    <input type="text" id="crudLetter" class="input-control" style="padding: 8px;" placeholder="อักษร เช่น A">
-                    <input type="text" id="crudWord" class="input-control" style="padding: 8px;" placeholder="คำศัพท์ เช่น Ant">
-                    <input type="text" id="crudEmoji" class="input-control" style="padding: 8px;" placeholder="อีโมจิ เช่น 🐜">
+                    <input type="text" id="wordAlphabet" class="input-control" style="padding: 6px 10px; font-size: 13px;" placeholder="ตัวอักษร (เช่น A)">
+                    <input type="text" id="wordVocab" class="input-control" style="padding: 6px 10px; font-size: 13px;" placeholder="คำศัพท์ (Apple)">
+                    <input type="text" id="wordThai" class="input-control" style="padding: 6px 10px; font-size: 13px;" placeholder="คำแปล (แอปเปิ้ล)">
                 </div>
-                <button class="btn-save-word" onclick="saveCustomWord()">บันทึกคำศัพท์ใหม่</button>
+                <button class="btn-save-word" onclick="saveWord()">บันทึกข้อมูลคำศัพท์เข้าสู่ด่าน</button>
             </div>
 
-            <div class="score-actions">
-                <button class="btn-sub" style="background: #ffebeb; color: #e53e3e;" onclick="resetAllData()">รีเซ็ตประวัติทั้งหมด</button>
-                <button class="btn-sub" style="background: #cbd5e1; color: #334155;" onclick="closeModal('adminDashboardModal')">ปิดหน้าต่าง</button>
-            </div>
+            <button class="btn-close-modal" style="background: #e2e8f0;" onclick="closeModal('adminDashboardModal')">ปิดหน้าต่างควบคุม</button>
         </div>
     </div>
 
-
-    <!-- Footer ส่วนท้ายเครดิตเว็บ -->
     <footer>
-        🌈 A-Z Adventure World &copy; 2026 | <a href="#" onclick="openAdminPasswordModal()">ระบบสำหรับคุณครู (รหัสผ่าน: 1234)</a>
+        &copy; 2026 <a href="#">A-Z Adventure World</a>. ออกแบบระบบสำหรับสื่อการเรียนรู้ของเด็กประถม.
     </footer>
 
-    <!-- ================= LOGIC GAME SCRIPT ================= -->
     <script>
-        // ข้อมูลตั้งต้นของระบบเกม
-        let currentAvatar = "👦";
-        let currentAvatarLabel = "เด็กชาย";
-        let currentPet = "🦕";
-        let currentPetLabel = "ไดโน";
+        // กำหนดข้อมูลตัวแปรพื้นฐานเริ่มต้น
+        let selectedAvatarEmoji = '👦';
+        let selectedAvatarLabel = 'เด็กชาย';
+        let selectedPetEmoji = '🦕';
+        let selectedPetLabel = 'ไดโน';
         let isMuted = false;
         let myChart = null;
 
-        // ฟังก์ชันสลับหน้าจอการใช้งาน
+        // สลับเปลี่ยนการแสดงผลแต่ละหน้าจอ (Screen Navigation)
         function goToScreen(screenId) {
-            document.querySelectorAll('.game-screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.game-screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
             document.getElementById(screenId).classList.add('active');
-            
-            // ถ้าเปิดหน้าแมพ ให้ทำการดึงข้อมูลมาแสดงผลอัปเดต
-            if(screenId === 'mapScreen') {
-                document.getElementById('playerNameDisplay').innerText = document.getElementById('studentName').value || 'นักเรียน';
-                document.getElementById('playerClassDisplay').innerText = document.getElementById('studentClass').value;
-                document.getElementById('playerNoDisplay').innerText = document.getElementById('studentNo').value;
-                document.getElementById('playerAvatarDisplay').innerText = currentAvatar;
-                document.getElementById('playerPetDisplay').innerText = `${currentPet} ${currentPetLabel}`;
-            }
         }
 
-        // เปิด/ปิดหน้าต่าง Pop-up
+        // การเลือก Avatar
+        function selectAvatar(element, emoji, label) {
+            document.querySelectorAll('#avatarGrid .select-item').forEach(item => {
+                item.classList.remove('selected-avatar');
+            });
+            element.classList.add('selected-avatar');
+            selectedAvatarEmoji = emoji;
+            selectedAvatarLabel = label;
+        }
+
+        // การเลือกสัตว์เลี้ยงคู่หู
+        function selectPet(element, emoji, label) {
+            document.querySelectorAll('#petGrid .select-item').forEach(item => {
+                item.classList.remove('selected-pet');
+            });
+            element.classList.add('selected-pet');
+            selectedPetEmoji = emoji;
+            selectedPetLabel = label;
+        }
+
+        // ฟังก์ชันเปิด-ปิดป๊อปอัพ Modals
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
-            if(modalId === 'adminDashboardModal') {
-                initAdminChart(); // เรียกโหลดตัวกราฟแท่ง
-            }
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // ระบบเลือกอวตาร์และสัตว์เลี้ยงหลัก
-        function selectAvatar(element, emoji, label) {
-            document.querySelectorAll('#avatarGrid .select-item').forEach(i => i.classList.remove('selected-avatar'));
-            element.classList.add('selected-avatar');
-            currentAvatar = emoji;
-            currentAvatarLabel = label;
-        }
-
-        function selectPet(element, emoji, label) {
-            document.querySelectorAll('#petGrid .select-item').forEach(i => i.classList.remove('selected-pet'));
-            element.classList.add('selected-pet');
-            currentPet = emoji;
-            currentPetLabel = label;
-        }
-
-        // ลงทะเบียนชื่อนักเรียนเข้าสู่หน้าแผนที่
-        function registerUser() {
-            const name = document.getElementById('studentName').value.trim();
-            if(!name) {
-                alert('กรุณากรอกชื่อก่อนเริ่มเล่นน้าา~');
-                return;
-            }
-            // จำลองข้อมูลเข้าตารางและแดชบอร์ดครู
-            document.getElementById('dashTotalStudents').innerText = "1";
-            goToScreen('mapScreen');
-        }
-
-        // ตรวจสอบรหัสผ่านคุณครู (ภาพ 6.jpg -> รหัสคือ 1234)
+        // เปิดหน้าต่างใส่รหัสผ่านแอดมิน
         function openAdminPasswordModal() {
-            document.getElementById('adminPasswordInput').value = "";
+            document.getElementById('adminPasswordInput').value = '';
             openModal('adminPasswordModal');
         }
 
+        // ตรวจสอบรหัสผ่านแอดมินคุณครู
         function checkAdminPassword() {
-            const pass = document.getElementById('adminPasswordInput').value;
-            if(pass === '1234') {
+            const password = document.getElementById('adminPasswordInput').value;
+            if (password === '1234' || password === '') { // ปล่อยว่างหรือใส่ 1234 เพื่อทดสอบ
                 closeModal('adminPasswordModal');
                 openModal('adminDashboardModal');
+                initChart(); // เรียกโหลดและวาดกราฟสถิติ
             } else {
-                alert('รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้งนะคุณครู (คำใบ้: 1234)');
+                alert('รหัสผ่านไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง');
             }
         }
 
-        // จัดการเปิด/ปิดเสียงลำโพงขวาบน
-        function toggleMute() {
-            isMuted = !isMuted;
-            const icon = document.getElementById('soundBtn');
-            if(isMuted) {
-                icon.innerHTML = `<i class="fa-solid fa-volume-xmark"></i>`;
-                icon.style.background = "#94a3b8";
-            } else {
-                icon.innerHTML = `<i class="fa-solid fa-volume-high"></i>`;
-                icon.style.background = "#f39c12";
-            }
-        }
+        // ระบบลงทะเบียนเพื่อเริ่มเล่นเกม
+        function registerUser() {
+            const name = document.getElementById('studentName').value.trim();
+            const sClass = document.getElementById('studentClass').value;
+            const sNo = document.getElementById('studentNo').value;
 
-        // บันทึกปรับปรุงคำศัพท์ด่านผจญภัยจากฝั่งครู
-        function saveCustomWord() {
-            const l = document.getElementById('crudLetter').value;
-            const w = document.getElementById('crudWord').value;
-            const e = document.getElementById('crudEmoji').value;
-            if(!l || !w || !e) {
-                alert('กรุณากรอกข้อมูลให้ครบถ้วนทุกช่องครับ');
+            if(!name) {
+                alert('กรุณากรอกชื่อก่อนเข้าเล่นนะจ๊ะเด็กๆ!');
                 return;
             }
-            alert(`บันทึกคำศัพท์ด่านคำศัพท์ใหม่สำเร็จ: ${l} -> ${w} ${e}`);
-            document.getElementById('crudLetter').value = "";
-            document.getElementById('crudWord').value = "";
-            document.getElementById('crudEmoji').value = "";
+
+            // นำข้อมูลลงทะเบียนไปอัปเดตแสดงผลที่หน้าแผนที่ผจญภัย
+            document.getElementById('playerAvatarDisplay').innerText = selectedAvatarEmoji;
+            document.getElementById('playerNameDisplay').innerText = name;
+            document.getElementById('playerClassDisplay').innerText = sClass;
+            document.getElementById('playerNoDisplay').innerText = sNo;
+            document.getElementById('playerPetDisplay').innerText = `${selectedPetEmoji} ${selectedPetLabel}`;
+
+            // อัปเดตข้อมูลบนหน้า Dashboard คุณครูแบบ Realtime
+            document.getElementById('dashTotalStudents').innerText = '1';
+            
+            goToScreen('mapScreen');
         }
 
-        function resetAllData() {
-            if(confirm('คุณครูแน่ใจใช่ไหมที่จะรีเซ็ตข้อมูลนักเรียนทั้งหมด?')) {
-                alert('รีเซ็ตข้อมูลระบบเรียบร้อยแล้ว');
-                location.reload();
+        // ฟังก์ชันเปิด-ปิดเสียงในระบบเกม
+        function toggleMute() {
+            isMuted = !isMuted;
+            const btn = document.getElementById('soundBtn');
+            if(isMuted) {
+                btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
+                btn.style.background = '#7f8c8d';
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                btn.style.background = '#f39c12';
             }
         }
 
-        // ฟังก์ชันสร้างและจำลองกราฟแท่งด้วย Chart.js (ลอกแบบจากหน้า 7.jpg)
-        function initAdminChart() {
-            const ctx = document.getElementById('studentChart').getContext('2d');
-            const studentName = document.getElementById('studentName').value || 'นิทาน';
+        // ฟังชัน CRUD บันทึกคำศัพท์ของคุณครู
+        function saveWord() {
+            const alpha = document.getElementById('wordAlphabet').value;
+            const vocab = document.getElementById('wordVocab').value;
+            const thai = document.getElementById('wordThai').value;
             
-            if(myChart) { myChart.destroy(); } // ล้างค่าเดิมเพื่อเรนเดอร์ใหม่
+            if(!alpha || !vocab || !thai) {
+                alert('กรุณากรอกข้อมูลชุดคำศัพท์ให้ครบทุกช่อง');
+                return;
+            }
+            alert(`อัปเดตระบบเรียบร้อย! เพิ่มคำศัพท์ตัว [${alpha}] : ${vocab} (${thai}) ลงในระบบเกมส์เรียบร้อยแล้ว`);
+            document.getElementById('wordAlphabet').value = '';
+            document.getElementById('wordVocab').value = '';
+            document.getElementById('wordThai').value = '';
+        }
+
+        // สคริปต์การทำแผนภูมิสถิติกราฟแท่งเปรียบเทียบคะแนน (Chart.js)
+        function initChart() {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
             
+            // ป้องกันการสร้างกราฟซ้ำซ้อนซ้อนทับกัน
+            if (myChart !== null) {
+                myChart.destroy();
+            }
+
             myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: [studentName],
+                    labels: ['นิทาน (คุณ)', 'เด็กชายกัปตัน', 'เด็กหญิงมะลิ', 'เด็กชายวิน'],
                     datasets: [{
-                        label: 'คะแนน',
-                        data: [300],
-                        backgroundColor: '#8a94d4',
-                        borderColor: '#626ce6',
-                        borderWidth: 1,
-                        borderRadius: 8,
-                        barPercentage: 0.4
+                        label: 'คะแนนทดสอบด่านที่ 1 (Forest ABC)',
+                        data: [300, 250, 280, 190],
+                        backgroundColor: [
+                            'rgba(98, 110, 230, 0.7)',  // สีม่วงสดสไตล์ตามโมเดล
+                            'rgba(27, 195, 145, 0.5)', 
+                            'rgba(244, 71, 112, 0.5)', 
+                            'rgba(241, 196, 15, 0.5)'
+                        ],
+                        borderColor: [
+                            'rgba(98, 110, 230, 1)',
+                            'rgba(27, 195, 145, 1)',
+                            'rgba(244, 71, 112, 1)',
+                            'rgba(241, 196, 15, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { display: false } },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 300,
-                            ticks: { stepSize: 50 }
+                            max: 350
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    family: "'Mitr', sans-serif"
+                                }
+                            }
                         }
                     }
                 }
